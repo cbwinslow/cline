@@ -140,22 +140,22 @@ gh issue create \
   --repo "$REPO" \
   --title "Code quality: Replace deprecated substr() with substring()" \
   --label "code-quality,priority: medium,technical-debt" \
-  --body "The deprecated \`substr()\` method is used in 3 locations and should be replaced with \`substring()\`.
+  --body "The deprecated \`substr()\` method is used in 1 location and should be replaced with \`substring()\`.
 
-**Files to Update:**
-1. \`src/tui/core/RulesManager.ts\` line 82
-2. \`src/tui/core/RulesManager.ts\` line 117
-3. \`src/tui/core/MemoryManager.ts\` line 64
+**Note:** Two of the three instances mentioned in the PR review (lines 82 and 64) have already been fixed. Only one remains.
+
+**File to Update:**
+1. \`src/tui/core/RulesManager.ts\` line 117
 
 **Change:**
 Replace:
 \`\`\`typescript
-Math.random().toString(36).substr(2, 9)
+id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
 \`\`\`
 
 With:
 \`\`\`typescript
-Math.random().toString(36).substring(2, 11)
+id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
 \`\`\`
 
 **Note:** The second parameter differs because \`substr()\` takes a length while \`substring()\` takes an ending index.

@@ -143,22 +143,22 @@ See `TUI_IMPLEMENTATION_STATUS.md` section "Runtime Module Resolution"
 **Labels:** `code-quality`, `priority: medium`, `technical-debt`
 
 **Description:**
-The deprecated `substr()` method is used in 3 locations across the TUI codebase. It should be replaced with the modern `substring()` method.
+The deprecated `substr()` method is used in 1 location in the TUI codebase. It should be replaced with the modern `substring()` method.
 
-**Files to Update:**
-1. `src/tui/core/RulesManager.ts` line 82
-2. `src/tui/core/RulesManager.ts` line 117
-3. `src/tui/core/MemoryManager.ts` line 64
+**Note:** Two of the three instances mentioned in the PR review (lines 82 and 64) have already been fixed. Only one remains.
+
+**File to Update:**
+1. `src/tui/core/RulesManager.ts` line 117
 
 **Changes Needed:**
-Replace all instances of:
+Replace:
 ```typescript
-Math.random().toString(36).substr(2, 9)
+id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
 ```
 
 With:
 ```typescript
-Math.random().toString(36).substring(2, 11)
+id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
 ```
 
 **Note:** The second parameter differs because `substr()` takes a length while `substring()` takes an ending index.
