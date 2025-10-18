@@ -48,20 +48,20 @@ export class MCPManager extends EventEmitter {
 		this.emit('serverStarting', { name });
 
 		try {
-			const process = spawn(server.config.command, server.config.args || [], {
+			const childProcess = spawn(server.config.command, server.config.args || [], {
 				env: { ...process.env, ...server.config.env },
 				stdio: ['pipe', 'pipe', 'pipe'],
 			});
 
-			server.process = process;
+			server.process = childProcess;
 			server.status = 'running';
 
-			process.on('error', (error) => {
+			childProcess.on('error', (error: Error) => {
 				server.status = 'error';
 				this.emit('serverError', { name, error });
 			});
 
-			process.on('exit', (code) => {
+			childProcess.on('exit', (code: number | null) => {
 				server.status = 'stopped';
 				this.emit('serverStopped', { name, code });
 			});

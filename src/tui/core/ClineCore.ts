@@ -179,8 +179,9 @@ export class ClineCore extends EventEmitter {
 		let prompt = 'You are Cline, an AI coding assistant with autonomous capabilities.';
 		
 		// Add custom instructions
-		if (this.config.customInstructions) {
-			prompt += '\n\n' + this.config.customInstructions;
+		const customInstructions = (this.config as any).customInstructions;
+		if (customInstructions) {
+			prompt += '\n\n' + customInstructions;
 		}
 
 		// Add rules
@@ -266,12 +267,12 @@ export class ClineCore extends EventEmitter {
 
 	private async listFiles(dirPath: string, recursive: boolean): Promise<string> {
 		const fullPath = path.resolve(this.cwd, dirPath);
-		const files = await listFiles(fullPath, recursive);
+		const [files, _] = await listFiles(fullPath, recursive, 1000);
 		return files.join('\n');
 	}
 
 	private async searchFiles(regex: string, filePattern?: string): Promise<string> {
-		const results = await regexSearchFiles(this.cwd, regex, filePattern);
+		const results = await regexSearchFiles(this.cwd, regex, filePattern || '');
 		return results;
 	}
 
