@@ -91,4 +91,6 @@ program
 		console.log('Cline configuration initialized');
 	});
 
-program.parse(process.argv);
+(async () => {
+    await program.parseAsync(process.argv);
+})();
