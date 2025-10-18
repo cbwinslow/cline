@@ -80,13 +80,38 @@ const extensionConfig = {
 	external: ["vscode"],
 }
 
+const tuiConfig = {
+	bundle: true,
+	minify: production,
+	sourcemap: !production,
+	logLevel: "silent",
+	plugins: [
+		/* add to the end of plugins array */
+		esbuildProblemMatcherPlugin,
+	],
+	entryPoints: ["src/tui/cli.ts"],
+	format: "cjs",
+	sourcesContent: false,
+	platform: "node",
+	outfile: "dist/tui/cli.js",
+	banner: {
+		js: "#!/usr/bin/env node",
+	},
+	external: ["vscode"],
+}
+
 async function main() {
 	const extensionCtx = await esbuild.context(extensionConfig)
+	const tuiCtx = await esbuild.context(tuiConfig)
+	
 	if (watch) {
 		await extensionCtx.watch()
+		await tuiCtx.watch()
 	} else {
 		await extensionCtx.rebuild()
+		await tuiCtx.rebuild()
 		await extensionCtx.dispose()
+		await tuiCtx.dispose()
 	}
 }
 
