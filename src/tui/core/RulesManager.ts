@@ -79,7 +79,7 @@ export class RulesManager {
 		for (const ruleData of defaultRules) {
 			const rule: Rule = {
 				...ruleData,
-				id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+				id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
 			};
 			this.rules.set(rule.id, rule);
 		}
