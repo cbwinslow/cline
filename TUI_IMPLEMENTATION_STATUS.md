@@ -131,22 +131,24 @@ Error [ERR_MODULE_NOT_FOUND]: Cannot find module
 
 **Solution Options**:
 
-1. **Option A: Use CJS Format** (Simplest)
+1. **Option A: Fix ESM Import Paths** (Recommended)
+   - Add `.js` extensions to imports in problematic packages
+   - Use esbuild resolveExtensions option
+   - May require patching some dependencies
+   - Keeps modern ES module benefits
+
+2. **Option B: Selective External Bundling**
+   - Bundle most code but mark specific problematic packages as external
+   - Ensure those packages are properly installed in node_modules
+   - Use package.json exports fields correctly
+   - Better compatibility without sacrificing modularity
+
+3. **Option C: Use CJS as Fallback** (Last Resort)
    - Change `format: "esm"` to `format: "cjs"` in esbuild config
    - Remove ES module package.json
-   - May lose some modern ESM benefits
+   - Loses some modern ESM benefits but maximum compatibility
 
-2. **Option B: Selective Bundling** (Recommended)
-   - Bundle most code but external specific problematic modules
-   - Add proper package.json exports to those modules
-   - Use import maps or Node.js --experimental-loader
-
-3. **Option C: Dynamic Imports** (Advanced)
-   - Lazy-load problematic modules
-   - Use dynamic import() for CJS modules
-   - Requires code structure changes
-
-**Recommendation**: Try Option A first for quickest path to working TUI.
+**Recommendation**: Try Options A and B first to maintain modern ES module architecture. Option C is only if time-constrained or compatibility is critical.
 
 ### 📝 Testing (Not Started)
 
@@ -217,8 +219,9 @@ To complete the TUI implementation:
 
 1. **Fix Runtime Issues** (Priority: High)
    ```bash
-   # Try CJS format first
-   # Edit esbuild.js, change format to "cjs"
+   # Try fixing ESM imports first
+   # Edit esbuild.js to add resolveExtensions
+   # Or mark problematic packages as external
    npm run compile
    node dist/tui/cli-wrapper.mjs --help
    ```
