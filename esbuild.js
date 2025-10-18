@@ -25,6 +25,35 @@ const esbuildProblemMatcherPlugin = {
 	},
 }
 
+const createTUIWrapperPlugin = {
+	name: "create-tui-wrapper",
+	setup(build) {
+		// Mock react-devtools-core which is optional for Ink
+		build.onResolve({ filter: /^react-devtools-core$/ }, () => {
+			return { path: path.join(__dirname, "src/tui/stubs/react-devtools-core.ts") }
+		})
+		
+		// Mock vscode module for TUI build
+		build.onResolve({ filter: /^vscode$/ }, () => {
+			return { path: path.join(__dirname, "src/tui/stubs/vscode.ts") }
+		})
+		
+		build.onEnd(() => {
+			// Create package.json for ESM support
+			const packageJsonPath = path.join(__dirname, "dist", "tui", "package.json")
+			fs.writeFileSync(packageJsonPath, JSON.stringify({ type: "module" }, null, 2))
+
+			// Create wrapper script with shebang
+			const wrapperPath = path.join(__dirname, "dist", "tui", "cli-wrapper.mjs")
+			const wrapperContent = `#!/usr/bin/env node
+import './cli.js';
+`
+			fs.writeFileSync(wrapperPath, wrapperContent)
+			fs.chmodSync(wrapperPath, 0o755)
+		})
+	},
+}
+
 const copyWasmFiles = {
 	name: "copy-wasm-files",
 	setup(build) {
@@ -80,13 +109,39 @@ const extensionConfig = {
 	external: ["vscode"],
 }
 
+const tuiConfig = {
+	bundle: true,
+	minify: production,
+	sourcemap: !production,
+	logLevel: "silent",
+	plugins: [
+		createTUIWrapperPlugin,
+		/* add to the end of plugins array */
+		esbuildProblemMatcherPlugin,
+	],
+	entryPoints: ["src/tui/cli.ts"],
+	format: "esm",
+	sourcesContent: false,
+	platform: "node",
+	outfile: "dist/tui/cli.js",
+	external: [],
+	mainFields: ["module", "main"],
+	conditions: ["node", "import"],
+	packages: "external",
+}
+
 async function main() {
 	const extensionCtx = await esbuild.context(extensionConfig)
+	const tuiCtx = await esbuild.context(tuiConfig)
+	
 	if (watch) {
 		await extensionCtx.watch()
+		await tuiCtx.watch()
 	} else {
 		await extensionCtx.rebuild()
+		await tuiCtx.rebuild()
 		await extensionCtx.dispose()
+		await tuiCtx.dispose()
 	}
 }
 
