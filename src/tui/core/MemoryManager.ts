@@ -61,7 +61,7 @@ export class MemoryManager {
 	 */
 	async addMemory(content: string, tags: string[] = []): Promise<Memory> {
 		const memory: Memory = {
-			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			id: Date.now().toString() + Math.random().toString(36).substring(2, 11),
 			content,
 			timestamp: Date.now(),
 			tags,
